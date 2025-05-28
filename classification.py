@@ -9,7 +9,8 @@
 # Attribution Information: The NLP projects were developed at ShanghaiTech University.
 # The core projects and autograders were adapted by Haoyi Wu (wuhy1@shanghaitech.edu.cn)
 
-
+import os
+os.environ["HF_ENDPOINT"]="https://hf-mirror.com"
 from typing import Callable
 import argparse
 from transformers import pipeline
@@ -37,9 +38,25 @@ def get_topic_classification_pipeline() -> Callable[[str], dict]:
         >>> result = func("Would the US constitution be changed if the admendment received 2/3 of the popular vote?")
         {"label": "Politics & Government", "score": 0.9999999403953552}
     """
-    pipe = pipeline(model="cointegrated/rubert-tiny-sentiment-balanced")
+    pipe = pipeline(model="fabriceyhc/bert-base-uncased-yahoo_answers_topics")
     def func(text: str) -> dict:
-        return pipe(text)[0]
+        label_mapping = {
+            'LABEL_0': 'Society & Culture',
+            'LABEL_1': 'Science & Mathematics',
+            'LABEL_2': 'Health',
+            'LABEL_3': 'Education & Reference',
+            'LABEL_4': 'Computers & Internet',
+            'LABEL_5': 'Sports',
+            'LABEL_6': 'Business & Finance',
+            'LABEL_7': 'Entertainment & Music',
+            'LABEL_8': 'Family & Relationships',
+            'LABEL_9': 'Politics & Government'
+        }
+        raw_result = pipe(text)[0]
+        return {
+            'label': label_mapping.get(raw_result['label'], raw_result['label']),
+            'score': raw_result['score']
+        }
     return func
 
 

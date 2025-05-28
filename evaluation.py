@@ -9,11 +9,13 @@
 # Attribution Information: The NLP projects were developed at ShanghaiTech University.
 # The core projects and autograders were adapted by Haoyi Wu (wuhy1@shanghaitech.edu.cn)
 
-
+import os
+os.environ["HF_ENDPOINT"]="https://hf-mirror.com"
 from typing import Callable
 import argparse
 import evaluate
 import util
+from evaluate import load
 
 
 def get_macro_f1_metric() -> Callable[[], float]:
@@ -33,12 +35,17 @@ def get_macro_f1_metric() -> Callable[[], float]:
     """
 
     """YOUR CODE HERE"""
-    util.raiseNotDefined()
+    # util.raiseNotDefined()
+    f1_metric = load("f1")
+    def compute_macro_f1(preds: list, golds: list) -> float:
+        res = f1_metric.compute(predictions=preds, references=golds, average="macro")
+        return res['f1']
+    return compute_macro_f1
 
 
 def main():
     parser = argparse.ArgumentParser(description="Metric Evaluation")
-    parser.add_argument("--metric", type=str, help="Metric name", choices=["accuracy", "f1"], default="accuracy")
+    parser.add_argument("--metric", type=str, help="Metric name", choices=["accuracy", "f1"], default="f1")
 
     args = parser.parse_args()
 
