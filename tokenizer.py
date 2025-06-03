@@ -56,7 +56,36 @@ def clean_vocab(vocab: Dict[str, int], merges: List[Tuple[str, str]]):
     """
 
     """YOUR CODE HERE"""
-    util.raiseNotDefined()
+
+    def remove_head(token):
+        return token[1:] if token.startswith("Ġ") else token
+
+    tokens_to_remove = set()
+    # 第一遍遍历：标记并删除需要移除的token
+    for token in list(vocab.keys()):
+        token_core = remove_head(token)
+        if token_core.isdigit() and len(token_core) > 1:
+            tokens_to_remove.add(token)
+            del vocab[token]
+
+    # 预计算剩余token的数字属性
+    token_is_digit = {token: remove_head(token).isdigit() for token in vocab}
+
+    valid_merges = []
+    # 第二遍遍历：过滤有效的合并对
+    for first, second in merges:
+        if first in tokens_to_remove or second in tokens_to_remove:
+            continue
+        if token_is_digit[first] and token_is_digit[second]:
+            continue
+        valid_merges.append((first, second))
+
+    # 更新合并列表
+    merges[:] = valid_merges
+
+    # 重新排序词汇表
+    sorted_items = sorted(vocab.items(), key=lambda x: x[1])
+    vocab.update({token: i for i, (token, _) in enumerate(sorted_items)})
 
 
 if __name__ == '__main__':
