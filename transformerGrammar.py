@@ -443,7 +443,7 @@ def get_trainer(
     # util.raiseNotDefined()
     model_training_config = TrainingArguments(
         output_dir="./outputs",
-        num_train_epochs=30,
+        num_train_epochs=3,
         per_device_train_batch_size=32,
         learning_rate=1e-3,
         weight_decay=0.01,
